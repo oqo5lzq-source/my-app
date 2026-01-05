@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>保存ができる在庫管理</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 380px; }
+        h2 { text-align: center; color: #333; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input[type="text"] { flex: 2; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        input[type="number"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .add-btn { background: #007bff; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
+        ul { list-style: none; padding: 0; }
+        li { background: #fff; border-bottom: 1px solid #eee; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .delete-btn { background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📦 在庫リスト</h2>
+    <div class="input-group">
+        <input type="text" id="itemName" placeholder="商品名">
+        <input type="number" id="itemCount" value="1">
+    </div>
+    <button class="add-btn" onclick="addItem()">追加する</button>
+
+    <ul id="itemList"></ul>
+</div>
+
+<script>
+    // 1. ページを開いた時に、保存されているデータを読み込む
+    window.onload = function() {
+        const savedData = localStorage.getItem('myInventory');
+        if (savedData) {
+            inventory = JSON.parse(savedData);
+            displayItems();
+        }
+    };
+
+    let inventory = [];
+
+    // 2. 在庫を追加する関数
+    function addItem() {
+        const name = document.getElementById('itemName').value;
+        const count = document.getElementById('itemCount').value;
+
+        if (!name) return alert("名前を入れてね");
+
+        inventory.push({ name: name, count: count });
+        saveAndRefresh();
+        
+        document.getElementById('itemName').value = ""; // 入力欄を空に
+    }
+
+    // 3. 在庫を削除する関数
+    function deleteItem(index) {
+        inventory.splice(index, 1);
+        saveAndRefresh();
+    }
+
+    // 4. データを保存して、画面を更新する
+    function saveAndRefresh() {
+        localStorage.setItem('myInventory', JSON.stringify(inventory));
+        displayItems();
+    }
+
+    // 5. 画面にリストを表示する
+    function displayItems() {
+        const list = document.getElementById('itemList');
+        list.innerHTML = "";
+        inventory.forEach((item, index) => {
+            list.innerHTML += `
+                <li>
+                    <span>${item.name} (<b>${item.count}</b>)</span>
+                    <button class="delete-btn" onclick="deleteItem(${index})">削除</button>
+                </li>`;
+        });
+    }
+</script>
+
+</body>
+</html>
